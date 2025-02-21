@@ -5,13 +5,64 @@ api: 5.0.0
 author: Taqdees
 description: Spawn pet mobs that follow you
 
-commands:
-  pets:
-    description: Open the pets menu
-    usage: "/pets"
-    permission: pets.command
+# commands:
+#   pets:
+#     description: Open the pets menu
+#     usage: "/pets"
+#     permission: pets.command
     
 permissions:
   pets.command:
     description: Allows using the /pets command
     default: true
+  pets.type.zombie:
+    description: Allows spawning zombie pet
+    default: false
+  pets.type.skeleton:
+    description: Allows spawning skeleton pet
+    default: false
+  pets.type.creeper:
+    description: Allows spawning creeper pet
+    default: false
+  pets.type.spider:
+    description: Allows spawning spider pet
+    default: false
+  pets.type.cow:
+    description: Allows spawning cow pet
+    default: false
+  pets.type.pig:
+    description: Allows spawning pig pet
+    default: false
+  pets.type.sheep:
+    description: Allows spawning sheep pet
+    default: false
+  pets.type.chicken:
+    description: Allows spawning chicken pet
+    default: false
+  pets.type.blaze:
+    description: Allows spawning blaze pet
+    default: false
+  pets.type.enderman:
+    description: Allows spawning enderman pet
+    default: false
+  pets.type.wolf:
+    description: Allows spawning wolf pet
+    default: false
+  pets.type.ghast:
+    description: Allows spawning ghast pet
+    default: false
+  pets.type.slime:
+    description: Allows spawning slime pet
+    default: false
+  pets.type.magma_cube:
+    description: Allows spawning magma cube pet
+    default: false
+  pets.type.witch:
+    description: Allows spawning witch pet
+    default: false
+  pets.type.villager:
+    description: Allows spawning villager pet
+    default: false
+  pets.type.squid:
+    description: Allows spawning squid pet
+    default: false

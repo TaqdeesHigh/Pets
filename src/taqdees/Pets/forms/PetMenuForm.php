@@ -5,9 +5,9 @@ namespace taqdees\Pets\forms;
 
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use taqdees\Pets\util\EntityRegistry;
 use taqdees\Pets\util\PetManager;
-use taqdees\Pets\data\EntitySizeData;
 
 class PetMenuForm {
     private PetManager $petManager;
@@ -31,6 +31,13 @@ class PetMenuForm {
             }
 
             $entityType = $entityTypes[$data];
+            
+            // Check permission for specific pet
+            if (!$player->hasPermission("pets.type." . $entityType)) {
+                $player->sendMessage(TextFormat::RED . "You don't have this pet unlocked!");
+                return;
+            }
+
             $namingForm = new PetNamingForm($this->petManager, $entityType);
             $namingForm->send($player);
         });
@@ -38,17 +45,25 @@ class PetMenuForm {
         $form->setTitle("Pets Menu");
         $form->setContent("Select a pet to follow you:");
         
-        $this->addPetButtons($form);
-
-        $form->addButton("Remove Pet\nNo Pet");
+        $this->addPetButtons($form, $player);
+        $form->addButton("Remove Pet");
         
         $form->sendToPlayer($player);
     }
     
-    private function addPetButtons(SimpleForm $form): void {
+    private function addPetButtons(SimpleForm $form, Player $player): void {
         foreach ($this->entityRegistry->getEntityTypes() as $entityType) {
-            $category = EntitySizeData::getEntityCategory($entityType);
-            $form->addButton(ucfirst($entityType) . "\n" . $category);
+            $permission = "pets.type." . $entityType;
+            $hasPermission = $player->hasPermission($permission);
+            
+            $buttonText = ucfirst($entityType);
+            if (!$hasPermission) {
+                $buttonText = TextFormat::RED . $buttonText;
+            } else {
+                $buttonText = TextFormat::GREEN . $buttonText;
+            }
+            
+            $form->addButton($buttonText);
         }
     }
 }

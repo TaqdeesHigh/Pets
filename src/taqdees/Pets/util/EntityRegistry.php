@@ -44,6 +44,7 @@ class EntityRegistry {
     
     private function registerCustomEntities(): void {
         $customEntities = [
+            "zombie" => EntityIds::ZOMBIE,
             "skeleton" => EntityIds::SKELETON,
             "creeper" => EntityIds::CREEPER,
             "spider" => EntityIds::SPIDER,
@@ -57,7 +58,9 @@ class EntityRegistry {
             "ghast" => EntityIds::GHAST,
             "slime" => EntityIds::SLIME,
             "magma_cube" => EntityIds::MAGMA_CUBE,
-            "witch" => EntityIds::WITCH
+            "witch" => EntityIds::WITCH,
+            "villager" => EntityIds::VILLAGER,
+            "squid" => EntityIds::SQUID
         ];
         
         foreach ($customEntities as $name => $entityId) {
