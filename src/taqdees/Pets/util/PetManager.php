@@ -71,7 +71,7 @@ class PetManager {
         }
     }
     
-    private function createPetEntity(Player $player, string $entityType): ?Entity {
+    private function createPetEntity(Player $player, string $entityType): Entity {
         $pos = $player->getPosition()->add(0, 0, 1);
         $location = new Location(
             $pos->x,
