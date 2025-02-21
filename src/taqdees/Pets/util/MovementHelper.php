@@ -8,14 +8,11 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
 class MovementHelper {
+    
     public static function findGroundPosition(Vector3 $pos, ?Player $player = null): Vector3 {
         $world = $player ? $player->getWorld() : null;
-        if (!$world && !($pos instanceof Player)) {
+        if (!$world) {
             return $pos; // Cannot find ground without world context
-        }
-        
-        if (!$world && $pos instanceof Player) {
-            $world = $pos->getWorld();
         }
         
         $x = $pos->x;
