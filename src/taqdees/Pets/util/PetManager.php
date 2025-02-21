@@ -56,13 +56,7 @@ class PetManager {
         
         try {
             $entity = $this->createPetEntity($player, $entityType);
-            
-            if ($entity instanceof Living) {
-                $this->setupPet($player, $entity, $entityType, $customName);
-            } else {
-                $entity->close();
-                $player->sendMessage(TextFormat::RED . "This entity type cannot be a pet.");
-            }
+            $this->setupPet($player, $entity, $entityType, $customName);
         } catch (\Throwable $e) {
             $this->plugin->getLogger()->error("Failed to spawn pet: " . $e->getMessage());
             $player->sendMessage(TextFormat::RED . "Failed to spawn pet. Please try another type.");
