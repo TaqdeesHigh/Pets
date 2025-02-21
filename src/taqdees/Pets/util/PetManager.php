@@ -1,0 +1,200 @@
+<?php
+// util/PetManager.php
+declare(strict_types=1);
+
+namespace taqdees\Pets\util;
+
+use pocketmine\entity\Entity;
+use pocketmine\entity\Living;
+use pocketmine\entity\Location;
+use pocketmine\entity\Zombie;
+use pocketmine\entity\Squid;
+use pocketmine\entity\Villager;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\player\Player;
+use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
+use taqdees\Pets\Main;
+use taqdees\Pets\tasks\PetFollowTask;
+use taqdees\Pets\tasks\RespawnPetTask;
+
+class PetManager {
+    private Main $plugin;
+    private Config $petData;
+    private array $playerPets = [];
+    private array $petEntities = [];
+    
+    public function __construct(Main $plugin, Config $petData) {
+        $this->plugin = $plugin;
+        $this->petData = $petData;
+    }
+    
+    public function cleanupOldPets(): void {
+        foreach ($this->plugin->getServer()->getWorldManager()->getWorlds() as $world) {
+            foreach ($world->getEntities() as $entity) {
+                if ($entity instanceof Living && $entity->getNameTag() !== "") {
+                    if (strpos($entity->getNameTag(), "'s Pet") !== false || 
+                        strpos($entity->getNameTag(), TextFormat::AQUA) !== false) {
+                        $entity->flagForDespawn();
+                        $this->plugin->getLogger()->debug("Removed old pet entity: " . $entity->getNameTag());
+                    }
+                }
+            }
+        }
+    }
+    
+    public function spawnPet(Player $player, string $entityType, string $customName): void {
+        $registry = $this->plugin->getEntityRegistry();
+        
+        if (!$registry->entityTypeExists($entityType)) {
+            $player->sendMessage(TextFormat::RED . "Unknown entity type: $entityType");
+            return;
+        }
+        $this->removeExistingPet($player);
+        
+        try {
+            $entity = $this->createPetEntity($player, $entityType);
+            
+            if ($entity instanceof Living) {
+                $this->setupPet($player, $entity, $entityType, $customName);
+            } else {
+                $entity->close();
+                $player->sendMessage(TextFormat::RED . "This entity type cannot be a pet.");
+            }
+        } catch (\Throwable $e) {
+            $this->plugin->getLogger()->error("Failed to spawn pet: " . $e->getMessage());
+            $player->sendMessage(TextFormat::RED . "Failed to spawn pet. Please try another type.");
+        }
+    }
+    
+    private function removeExistingPet(Player $player): void {
+        $playerName = $player->getName();
+        if (isset($this->playerPets[$playerName])) {
+            $this->playerPets[$playerName]->flagForDespawn();
+            unset($this->playerPets[$playerName]);
+        }
+    }
+    
+    private function createPetEntity(Player $player, string $entityType): Living {
+        $pos = $player->getPosition()->add(0, 0, 1);
+        $location = new Location(
+            $pos->x,
+            $pos->y,
+            $pos->z,
+            $player->getWorld(),
+            $player->getLocation()->getYaw(),
+            $player->getLocation()->getPitch()
+        );
+        
+        if ($entityType === "zombie") {
+            return new Zombie($location);
+        } elseif ($entityType === "villager") {
+            return new Villager($location);
+        } elseif ($entityType === "squid") {
+            return new Squid($location);
+        } else {
+            $customClass = "taqdees\\Pets\\entity\\pets\\" . ucfirst($entityType) . "Pet";
+            return new $customClass($location);
+        }
+    }
+    
+    private function setupPet(Player $player, Living $entity, string $entityType, string $customName): void {
+        $entity->setNameTag(TextFormat::AQUA . $customName);
+        $entity->setNameTagAlwaysVisible(true);
+
+        $entity->spawnToAll();
+        $this->playerPets[$player->getName()] = $entity;
+        $this->petEntities[] = $entity;
+        
+        $this->savePetData($player, $entityType, $customName);
+        
+        // $player->sendMessage(TextFormat::GREEN . "You spawned a pet " . ucfirst($entityType) . " named " . $customName . "!");
+
+        $this->plugin->getScheduler()->scheduleRepeatingTask(
+            new PetFollowTask($player, $entity),
+            10
+        );
+    }
+    
+    private function savePetData(Player $player, string $entityType, string $customName): void {
+        $this->petData->set($player->getName(), [
+            "type" => $entityType,
+            "active" => true,
+            "customName" => $customName
+        ]);
+        $this->petData->save();
+    }
+    
+    public function removePet(Player $player): void {
+        $playerName = $player->getName();
+        
+        if (isset($this->playerPets[$playerName])) {
+            $this->playerPets[$playerName]->flagForDespawn();
+            unset($this->playerPets[$playerName]);
+            $this->petData->remove($playerName);
+            $this->petData->save();
+            
+            $player->sendMessage(TextFormat::GREEN . "Pet removed!");
+        }
+    }
+    
+    public function handlePlayerJoin(Player $player): void {
+        $playerName = $player->getName();
+        if ($this->petData->exists($playerName)) {
+            $petData = $this->petData->get($playerName);
+            if (isset($petData["active"]) && $petData["active"] === true) {
+                $this->cleanupPlayerPets($player);
+                $this->plugin->getScheduler()->scheduleDelayedTask(
+                    new RespawnPetTask($this, $player, $petData["type"], $petData["customName"] ?? ""),
+                    20
+                );
+            }
+        }
+    }
+    
+    private function cleanupPlayerPets(Player $player): void {
+        $playerName = $player->getName();
+        foreach ($player->getWorld()->getEntities() as $entity) {
+            if ($entity instanceof Living) {
+                $nameTag = $entity->getNameTag();
+                if (strpos($nameTag, $playerName) !== false && 
+                   (strpos($nameTag, "Pet") !== false || strpos($nameTag, TextFormat::AQUA) !== false)) {
+                    $entity->flagForDespawn();
+                    $this->plugin->getLogger()->debug("Removed stale pet for $playerName on join");
+                }
+            }
+        }
+    }
+    
+    public function handlePlayerQuit(Player $player): void {
+        $playerName = $player->getName();
+        
+        if (isset($this->playerPets[$playerName])) {
+            $this->playerPets[$playerName]->flagForDespawn();
+            unset($this->playerPets[$playerName]);
+        }
+    }
+    
+    public function handleEntityDespawn(Entity $entity): void {
+        if ($entity instanceof Living) {
+            $key = array_search($entity, $this->petEntities, true);
+            if ($key !== false) {
+                unset($this->petEntities[$key]);
+            }
+            foreach ($this->playerPets as $playerName => $pet) {
+                if ($pet === $entity) {
+                    unset($this->playerPets[$playerName]);
+                    break;
+                }
+            }
+        }
+    }
+    
+    public function isPetEntity(Entity $entity): bool {
+        return in_array($entity, $this->petEntities, true);
+    }
+    
+    public function getPlayerPet(string $playerName): ?Living {
+        return $this->playerPets[$playerName] ?? null;
+    }
+}

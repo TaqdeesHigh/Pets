@@ -1,0 +1,17 @@
+name: Pets
+main: taqdees\Pets\Main
+version: 1.0.0
+api: 5.0.0
+author: Taqdees
+description: Spawn pet mobs that follow you
+
+commands:
+  pets:
+    description: Open the pets menu
+    usage: "/pets"
+    permission: pets.command
+    
+permissions:
+  pets.command:
+    description: Allows using the /pets command
+    default: true
