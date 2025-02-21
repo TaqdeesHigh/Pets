@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace taqdees\Pets\forms;
 
-use jojoe77777\FormAPI\SimpleForm;
+use taqdees\Pets\lib\jojoe77777\FormAPI\SimpleForm;
+
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use taqdees\Pets\util\EntityRegistry;

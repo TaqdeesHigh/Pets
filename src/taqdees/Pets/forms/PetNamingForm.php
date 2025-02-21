@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace taqdees\Pets\forms;
 
-use jojoe77777\FormAPI\CustomForm;
+use taqdees\Pets\lib\jojoe77777\FormAPI\CustomForm;
 use pocketmine\player\Player;
 use taqdees\Pets\util\PetManager;
 
