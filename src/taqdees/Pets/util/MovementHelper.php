@@ -98,5 +98,5 @@ class MovementHelper {
         
         // Update pet rotation
         $pet->setRotation($yaw, $pitch);
-    }
+    } // Math
 }

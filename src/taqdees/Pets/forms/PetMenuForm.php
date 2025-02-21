@@ -31,8 +31,7 @@ class PetMenuForm {
             }
 
             $entityType = $entityTypes[$data];
-            
-            // Check permission for specific pet
+
             if (!$player->hasPermission("pets.type." . $entityType)) {
                 $player->sendMessage(TextFormat::RED . "You don't have this pet unlocked!");
                 return;

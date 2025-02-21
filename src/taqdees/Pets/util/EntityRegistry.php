@@ -1,5 +1,4 @@
 <?php 
-// util/EntityRegistry.php
 declare(strict_types=1);
 
 namespace taqdees\Pets\util;
@@ -88,7 +87,6 @@ class EntityRegistry {
             $this->defineCustomEntityClass($fullClassName, $name, $height, $width, $entityId);
         }
         
-        // Register with EntityFactory
         EntityFactory::getInstance()->register($fullClassName, function(World $world, CompoundTag $nbt) use ($fullClassName): Entity {
             return new $fullClassName(EntityDataHelper::parseLocation($nbt, $world), $nbt);
         }, [$entityId]);
