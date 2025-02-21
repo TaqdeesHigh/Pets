@@ -79,3 +79,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Credits
 
 Created by Taqdees
+
+(I Stole the icon file from here
+https://icons8.com/icons/set/minecraft--animated
+</3
+)
