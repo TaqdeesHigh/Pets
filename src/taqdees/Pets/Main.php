@@ -85,13 +85,7 @@ class Main extends PluginBase implements Listener {
         }
 
         $event->cancel();
-        
-        if ($event instanceof EntityDamageByEntityEvent) {
-            $damager = $event->getDamager();
-            if ($damager instanceof Player) {
-                $damager->sendMessage(TextFormat::RED . "Pets cannot be harmed!");
-            }
-        }
+
     }
     
     public function getPetManager(): PetManager {
