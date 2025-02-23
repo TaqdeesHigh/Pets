@@ -95,8 +95,7 @@ class PetManager {
     }
     
     private function setupPet(Player $player, Living $entity, string $entityType, string $customName): void {
-        // Set just the custom name
-        $entity->setNameTag(TextFormat::AQUA . $customName);
+        $entity->setNameTag(TextFormat::GRAY . $customName);
         $entity->setNameTagAlwaysVisible(true);
 
         $entity->spawnToAll();
@@ -107,7 +106,7 @@ class PetManager {
 
         $this->plugin->getScheduler()->scheduleRepeatingTask(
             new PetFollowTask($player, $entity),
-            10
+            1
         );
     }
     
@@ -157,7 +156,6 @@ class PetManager {
                 if ($nameTag !== "" && strpos($nameTag, TextFormat::AQUA) !== false) {
                     $entity->kill();
                     $entity->close();
-                    $this->plugin->getLogger()->debug("Removed stale pet for {$player->getName()} on join");
                 }
             }
         }

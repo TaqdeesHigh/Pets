@@ -12,54 +12,59 @@ class MovementHelper {
     public static function findGroundPosition(Vector3 $pos, ?Player $player = null): Vector3 {
         $world = $player ? $player->getWorld() : null;
         if (!$world) {
-            return $pos; // Cannot find ground without world context
+            return $pos;
         }
         
         $x = $pos->x;
         $z = $pos->z;
         
-        // Start from player's y position
+        // Start from player's position
         $y = $pos->y;
         
-        // Search downward for the first solid block
-        while ($y > 0) {
-            $block = $world->getBlockAt((int)$x, (int)$y, (int)$z);
-            $blockBelow = $world->getBlockAt((int)$x, (int)$y - 1, (int)$z);
-            
-            // If current block is air and block below is solid, we found ground
-            if ($block->isSolid() === false && $blockBelow->isSolid() === true) {
-                return new Vector3($x, $y, $z);
+        // If in air, start searching from a bit below the player
+        if ($y > 0) {
+            // Search for ground below player
+            while ($y > 0) {
+                $block = $world->getBlockAt((int)$x, (int)$y, (int)$z);
+                $blockBelow = $world->getBlockAt((int)$x, (int)$y - 1, (int)$z);
+                
+                // If current block is air and block below is solid, we found ground
+                if (!$block->isSolid() && $blockBelow->isSolid()) {
+                    return new Vector3($x, $y, $z);
+                }
+                
+                $y--;
             }
-            
-            $y--;
         }
         
-        // If no ground found, return world spawn height
+        // If no ground found or player below world, return spawn height
         return new Vector3($x, $world->getSpawnLocation()->y, $z);
     }
     
     public static function movePetTowardPlayer(Living $pet, Player $player): void {
-        // Calculate direction vector including vertical movement
+        // Calculate direction
         $directionVector = $player->getPosition()->subtractVector($pet->getPosition());
         
-        // Normalize and set speed
-        $directionVector = $directionVector->normalize()->multiply(0.6);
-        
-        // Check for blocks to climb
-        if (self::shouldPetClimb($pet, $player)) {
-            // Strong upward motion to jump/climb blocks
-            $motion = $pet->getMotion();
-            $motion->y = 0.5; // Increased vertical motion
-            $pet->setMotion($motion);
+        $speed = 0.75; 
+        if ($directionVector->lengthSquared() > 0) {
+            $directionVector = $directionVector->normalize()->multiply($speed);
+            
+            // Direct motion setting
+            $pet->setMotion(new Vector3(
+                $directionVector->x,
+                $pet->getMotion()->y, // Keep current Y motion
+                $directionVector->z
+            ));
         }
         
-        // Apply horizontal movement
-        $motion = $pet->getMotion();
-        $motion->x = $directionVector->x;
-        $motion->z = $directionVector->z;
-        $pet->setMotion($motion);
+        if (self::shouldPetClimb($pet, $player)) {
+            $pet->setMotion(new Vector3(
+                $directionVector->x,
+                0.5,
+                $directionVector->z
+            ));
+        }
         
-        // Make pet look at player (this part will track the head.)
         self::updatePetRotation($pet, $player);
     }
     
