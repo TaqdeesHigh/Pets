@@ -11,7 +11,6 @@ use taqdees\Pets\util\MovementHelper;
 class PetFollowTask extends Task {
     private Player $player;
     private Living $pet;
-    private bool $isMoving = false;
    
     public function __construct(Player $player, Living $pet) {
         $this->player = $player;
@@ -23,13 +22,13 @@ class PetFollowTask extends Task {
             $this->getHandler()->cancel();
             return;
         }
-        
+
         if ($this->pet->getWorld() !== $this->player->getWorld()) {
             $groundPos = MovementHelper::findGroundPosition($this->player->getPosition(), $this->player);
             $this->pet->teleport($groundPos);
             return;
         }
-        
+       
         $distance = $this->pet->getPosition()->distance($this->player->getPosition());
         if ($distance > 25) {
             $offset = $this->player->getPosition()->subtract(0, 0, 2);
@@ -37,7 +36,7 @@ class PetFollowTask extends Task {
             $this->pet->teleport($groundPos);
             return;
         }
-        
+
         if ($distance > 2) {
             MovementHelper::movePetTowardPlayer($this->pet, $this->player);
         }
