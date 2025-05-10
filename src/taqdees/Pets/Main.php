@@ -50,7 +50,7 @@ class Main extends PluginBase implements Listener {
     private function registerCommands(): void {
         $this->getServer()->getCommandMap()->register(
             "pets",
-            new PetsCommand($this->petManager, $this->entityRegistry)
+            new PetsCommand($this, $this->petManager, $this->entityRegistry)
         );
     }
 
