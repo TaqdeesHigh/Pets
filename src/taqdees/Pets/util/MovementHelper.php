@@ -17,22 +17,14 @@ class MovementHelper {
         
         $x = $pos->x;
         $z = $pos->z;
-        
-        // Start from player's position
         $y = $pos->y;
-        
-        // If in air, start searching from a bit below the player
         if ($y > 0) {
-            // Search for ground below player
             while ($y > 0) {
                 $block = $world->getBlockAt((int)$x, (int)$y, (int)$z);
                 $blockBelow = $world->getBlockAt((int)$x, (int)$y - 1, (int)$z);
-                
-                // If current block is air and block below is solid, we found ground
                 if (!$block->isSolid() && $blockBelow->isSolid()) {
                     return new Vector3($x, $y, $z);
                 }
-                
                 $y--;
             }
         }
