@@ -28,7 +28,7 @@ A feature-rich pets plugin that allows players to spawn and manage various mobs 
 
 - `pets.command` - Allows usage of the /pets command (default: true)
 - `pets.type.<mobname>` - Allows spawning specific pet types (default: op)
-  - Example: `pets.type.zombie`, `pets.type.cow`, etc.  By default, these permissions are granted to operators.
+  - Example: `pets.type.zombie`, `pets.type.cow`, etc.
 
 ### Pet Types Available
 
@@ -69,7 +69,7 @@ blacklisted-worlds:
 
 ### Permissions
 
-Adjust the permissions in your server's permission manager or `permissions.yml` to control which players can access specific pet types. By default, pet types are set to `op`.
+Adjust the permissions in your server's permission manager or `permissions.yml` to control which players can access specific pet types. By default, pet types are set to `default=false`.
 
 ## Features In Detail
 
