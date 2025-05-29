@@ -45,6 +45,10 @@ class PetsCommand extends Command implements PluginOwned {
         if (!$this->testPermission($sender)) {
             return true;
         }
+        if ($this->owningPlugin->isWorldBlacklisted($sender->getWorld()->getFolderName())) {
+            $sender->sendMessage(TextFormat::RED . "Pets are disabled in this world!");
+            return true;
+        }
         
         $petMenuForm = new PetMenuForm($this->petManager, $this->entityRegistry);
         $petMenuForm->send($sender);

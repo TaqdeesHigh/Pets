@@ -1,0 +1,4 @@
+# List of worlds where pets are disabled
+# Add world folder names to this list to blacklist them
+blacklisted-worlds:
+  - "world1"

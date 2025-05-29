@@ -43,8 +43,11 @@ class PetManager {
         }
     }
     
-    
     public function spawnPet(Player $player, string $entityType, string $customName): void {
+        if ($this->plugin->isWorldBlacklisted($player->getWorld()->getFolderName())) {
+            return;
+        }
+        
         $registry = $this->plugin->getEntityRegistry();
         
         if (!$registry->entityTypeExists($entityType)) {
@@ -108,6 +111,8 @@ class PetManager {
             new PetFollowTask($player, $entity),
             1
         );
+        
+        $player->sendMessage(TextFormat::GREEN . "Pet spawned: " . $customName);
     }
     
     private function savePetData(Player $player, string $entityType, string $customName): void {
@@ -133,7 +138,20 @@ class PetManager {
         }
     }
     
+    public function removePetSilently(Player $player): void {
+        $playerName = $player->getName();
+        
+        if (isset($this->playerPets[$playerName])) {
+            $this->playerPets[$playerName]->flagForDespawn();
+            unset($this->playerPets[$playerName]);
+        }
+    }
+    
     public function handlePlayerJoin(Player $player): void {
+        if ($this->plugin->isWorldBlacklisted($player->getWorld()->getFolderName())) {
+            return;
+        }
+        
         $playerName = $player->getName();
         
         if ($this->petData->exists($playerName)) {
