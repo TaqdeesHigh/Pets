@@ -1,3 +1,4 @@
+md
 # Pets Plugin for PocketMine-MP
 
 A feature-rich pets plugin that allows players to spawn and manage various mobs as pets that follow them around.
@@ -12,6 +13,7 @@ A feature-rich pets plugin that allows players to spawn and manage various mobs 
 - **Pet Management**: Easy-to-use commands and forms interface
 - **Automatic Following**: Pets automatically follow their owners
 - **Persistent Pets**: Pets are saved and respawn when players rejoin
+- **World Blacklisting**: Disable pets in specific worlds
 
 ## Usage
 
@@ -25,8 +27,8 @@ A feature-rich pets plugin that allows players to spawn and manage various mobs 
 ### Permissions
 
 - `pets.command` - Allows usage of the /pets command (default: true)
-- `pets.type.<mobname>` - Allows spawning specific pet types (default: false)
-  - Example: `pets.type.zombie`, `pets.type.cow`, etc.
+- `pets.type.<mobname>` - Allows spawning specific pet types (default: op)
+  - Example: `pets.type.zombie`, `pets.type.cow`, etc.  By default, these permissions are granted to operators.
 
 ### Pet Types Available
 
@@ -52,17 +54,33 @@ A feature-rich pets plugin that allows players to spawn and manage various mobs 
 
 ## Configuration
 
-Plugin configuration is handled through permissions. Adjust the permissions in your server's permission manager or permissions.yml to control which players can access specific pet types.
+Plugin configuration is handled through the `config.yml` file and permissions.
+
+### config.yml
+
+A `config.yml` file is now included to allow blacklisting worlds where pets are disabled.  Add the folder names of the worlds to the `blacklisted-worlds` list.
+
+```yaml
+# List of worlds where pets are disabled
+# Add world folder names to this list to blacklist them
+blacklisted-worlds:
+  - "world1"
+```
+
+### Permissions
+
+Adjust the permissions in your server's permission manager or `permissions.yml` to control which players can access specific pet types. By default, pet types are set to `op`.
 
 ## Features In Detail
 
 - **Smart Following**: Pets will intelligently follow players, including climbing blocks and avoiding obstacles
-- **World Management**: Pets will teleport to players when changing worlds
+- **World Management**: Pets will teleport to players when changing worlds. Pets are automatically removed in blacklisted worlds.
 - **Distance Management**: Pets automatically teleport to players if they get too far away
 - **Form Interface**: User-friendly form interface for pet management
 - **Name Customization**: Optional custom naming for pets
 - **Persistence**: Pets are saved between server restarts
 - **Cleanup System**: Automatic cleanup of old pet entities
+- **World Blacklisting**: Pets can be disabled in specific worlds by adding the world's folder name to the `blacklisted-worlds` list in the `config.yml` file. Players will receive a message when entering a blacklisted world.
 
 ## Support
 
