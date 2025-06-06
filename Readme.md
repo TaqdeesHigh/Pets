@@ -1,4 +1,3 @@
-md
 # Pets Plugin for PocketMine-MP
 
 A feature-rich pets plugin that allows players to spawn and manage various mobs as pets that follow them around.
